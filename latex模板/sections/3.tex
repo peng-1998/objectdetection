@@ -1,0 +1,30 @@
+\section{U-net的实现要点}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{\textsc{目录}} \vspace{-0.3cm}
+    \begin{spacing}{0.0}
+        \tableofcontents[currentsection,hideallsubsections]
+    \end{spacing}   % 若不想要目录, 注释掉该句
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+    \noindent\large\textbf{实现网络模型}
+
+    \vspace{1em}
+    U-net的实现网络模型并不复杂，使用到的操作有：卷积，转置卷积、池化、激活函数、批归一化、中心裁剪、拼接
+    \begin{lstlisting}
+nn.Conv2d(c_i,c_o,3)            #卷积
+nn.ConvTranspose2d(c_i,c_o,2,2) #反卷积
+nn.functional.max_pool2d(x,2,2) #最大池化
+nn.ReLU()
+nn.BatchNorm2d(c_o)             #批归一化
+x = x[:,:,c:-c,c:-c]            #中心裁剪
+torch.cat([x1,x2],dim=1)        #拼接
+    \end{lstlisting}
+\end{frame}
+
+%\section{应用}
+
+

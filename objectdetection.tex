@@ -1,0 +1,87 @@
+\documentclass{beamer}%[fleqn,usenatbib]{mnras}
+\setbeamertemplate{itemize items}[square]
+\mode<presentation>{
+\usetheme{Madrid}
+}
+%\usepackage{cite}
+\usepackage{natbib}
+\usepackage{enumitem}
+\usepackage{setspace}
+%\usepackage{enumerate}
+\setbeamertemplate{footline}[page number]
+\setbeamertemplate{navigation symbols}{}%去掉页面底部的导航符号
+%\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{booktabs}
+%\usepackage[fontset=windows]{ctex}
+\usepackage{ctex}
+\usepackage{multicol}
+\usepackage{setspace}
+\usepackage{animate}
+
+%\usefonttheme[onlymath]{serif}
+\usefonttheme{serif}
+\usepackage{bm}
+%\usepackage{algorithm}
+\usepackage[ruled]{algorithm2e}
+\usepackage{algorithmic}
+\usepackage{verbatim}
+\usepackage{ulem}
+\usepackage{bm}
+\usepackage{multicol}
+\usepackage{graphicx} %插入图片的包
+\usepackage{wrapfig}
+\usepackage{subfig}
+\usepackage{caption}
+\usepackage{multirow}
+\titlegraphic{\vspace{0.28\textheight}\flushleft{\hspace{-0.02\textwidth}\includegraphics[height=0.1\textwidth]{logo.png}}}
+\usepackage{ulem}
+\newcommand{\revise}[1]{\textcolor[rgb]{1.00,0.00,0.00}{{}#1}}
+\newcommand{\reviseok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{}#1}}
+%\newcommand{\proeric}[1]{\textcolor[rgb]{1.00,0.00,1.00}{{}#1}}
+\newcommand{\proericok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{}#1}}
+\renewcommand\tablename{表}
+\renewcommand\figurename{图}
+\renewcommand{\arraystretch}{1.4}
+\setbeamertemplate{caption}[numbered]
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    language         = Python,                          %代码语言使用的是python
+    frame            = shadowbox,                       %把代码用带有阴影的框圈起来
+    rulesepcolor     = \color{red!20!green!20!blue!20}, %代码块边框为淡青色
+    keywordstyle     = \color{blue!90}\bfseries,        %代码关键字的颜色为蓝色，粗体
+    commentstyle     = \color{red!10!green!70}\textit,  % 设置代码注释的颜色
+    showstringspaces = false,                           %不显示代码字符串中间的空格标记
+    numbers          = left,                            % 显示行号
+    numberstyle      = \tiny,                           % 行号字体
+    stringstyle      = \ttfamily,                       % 代码字符串的特殊格式
+    breaklines       = true,                            %对过长的代码自动换行
+    extendedchars    = false,                           %解决代码跨页时，章节标题，页眉等汉字不显示的问题
+    %escapebegin     = \begin{CJK*},                    escapeend = \end{CJK*}, % 代码中出现中文必须加上，否则报错
+    texcl            = true,
+    escapeinside     = ``,
+    xleftmargin      = 1em,
+    xrightmargin     = 1em,
+    aboveskip        = 1em
+}
+
+\def\IDM{IDM}
+\def\PR{PR}
+
+\title[目标检测概述与算法分析]
+
+\author{\Large 钟云鹏  \& 梅寰宇}
+\institutep[SCNU]{
+    \small 华南师范大学计算机学院
+}
+
+\data{\today}
+
+\begin{document}
+    \graphicspath{{figures/}}
+    \begin{frame}
+        \titlepage
+    \end{frame}
+\end{document}
