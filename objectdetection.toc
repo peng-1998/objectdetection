@@ -1,0 +1,8 @@
+\beamer@sectionintoc {1}{什么是目标检测}{4}{0}{1}
+\beamer@sectionintoc {2}{U-net：模型与原理}{13}{0}{2}
+\beamer@sectionintoc {3}{U-net的实现要点}{23}{0}{3}
+\beamer@sectionintoc {4}{损失函数、目标函数、权重函数}{25}{0}{4}
+\beamer@sectionintoc {5}{数据预处理与数据增强}{29}{0}{5}
+\beamer@sectionintoc {6}{探讨与扩展阅读}{33}{0}{6}
+\beamer@sectionintoc {7}{思考题}{35}{0}{7}
+\beamer@sectionintoc {8}{Reference}{37}{0}{8}

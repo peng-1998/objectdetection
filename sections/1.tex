@@ -1,6 +1,7 @@
-\section{图像分割问题}
+\section{什么是目标检测}
+
 \begin{frame}[allowframebreaks]
-  \frametitle{\textsc{目录}} \vspace{-0.3cm}
+    \frametitle{\textsc{目录}} \vspace{-0.3cm}
     \begin{spacing}{0.0}
         \tableofcontents[currentsection,hideallsubsections]
     \end{spacing}   % 若不想要目录, 注释掉该句
@@ -9,88 +10,77 @@
 
 
 \begin{frame}
-    \noindent\large\textbf{图像分割问题}
-
-    \vspace{1em}
-    图像分割任务：将完整图像分割成若干互不重叠的子区域
-
-    \vspace{0.1em}
-    从机器学习的角度来说，图像分割是为图像中的每一个像素点分配一个标签
-
-    \vspace{0.1em}
-    图像分割又分为语义分割（semantic segmentation）和实例分割（instance segmentation）
-    \begin{figure}
-        \subfloat[语义分割]{\includegraphics[width=5.5cm,height=3cm]{2.jpg}}
-        \subfloat[实例分割]{\includegraphics[width=5.5cm,height=3cm]{3.jpeg}}
-    \end{figure}
-\end{frame}
-
-\begin{frame}
-    \noindent\large\textbf{标签}
-
-    \vspace{0.1em}
-    语义分割：所属的物体的类别
-
-    \vspace{0.1em}
-    实例分割：所属对象的编号
-
-    \begin{figure}
-        \subfloat[类别标签]{\includegraphics[width=3.6cm,height=4.4cm]{4.png}}
-        \subfloat[对象标签]{\includegraphics[width=3.4cm,height=4.4cm]{5.png}}
-    \end{figure}
-
-    实例分割$\approx $目标检测$+$语义分割
-\end{frame}
-
-\begin{frame}
-    \noindent\large\textbf{数据}
-
+    \noindent\large\textbf{目标检测}
+    \vspace{0.4cm}
     \begin{itemize}
-    \item[$ \bullet $]  包含图像和标签（掩码、mask、Ground Truth）
-
-    %\vspace{1em}
-    \item[$ \bullet $]  图像与标签大小相同
-
-    %\vspace{1em}
-    \item[$ \bullet $]  图像与标签的像素一一对应
-
-    %\vspace{1em}
-    \item[$ \bullet $] 标签的形式多种多样，包括图像、描述文件、表格等形式
+        \item[$ \bullet $] 是什么？
+        \item[$ \bullet $] 在哪里？
+        \item[$ \bullet $] 有哪些？
     \end{itemize}
-
+    \vspace{1cm}
+    “是什么”意味着需要判断出找出来的目标是什么,也就是对目标的类别做判断,是人还是狗或者是车\\
     \vspace{1em}
-        \begin{figure}
-        \subfloat[mask]{\includegraphics[width=0.9\linewidth]{mask.png}}
-    \end{figure}
+    “在哪里”需要指出找到的目标在图像的那个地方,范围是哪里\\
+    \vspace{1em}
+    “有哪些”意味着需要将图像当中所有的感兴趣物体(预先定义的类别)找出来\\
+\end{frame}
 
- %   \noindent\large\textbf{常见数据集}
-%
-%    \vspace{1em} \small
-%    Common Objects in COntext（COCO）、PASCAL Visual Object Classes（PASAL）、
-%    The Cityscapes Dataset、The Cambridge-driving Labeled Video Database（CamVid）、
-%    Stanford Background Dataset、Barcelona Dataset、Microsoft Research in Cambridge、
-%    LITS Liver Tumor Segmentation Dataset、ISBI Challenge
+\begin{frame}
+    \noindent\large\textbf{如何表示}\\
+    在计算机当中需要用数字来表达“是什么”、“在哪里”、“在哪里”
+    \vspace{1em}
+    \begin{itemize}
+        \item[$ \bullet $] 整数(one-hot 向量)表示类别
+        \item[$ \bullet $] 矩形框表示位置(四元组$[x,y,w,h]$)
+        \item[$ \bullet $] 堆叠所有目标组成数组$n\times5$
+    \end{itemize}
+    \vspace{1em}
+    \begin{figure}
+        \includegraphics[width=0.3\linewidth]{box.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \noindent\large\textbf{基础知识}
+    \begin{itemize}
+        \item[$ \bullet $] 矩形框的3种表示
+            矩形框的表示形式有：\\
+            $[x,y,w,h]$ \\
+            $[x_1,y_1,x_2,y_2]([left,top,right,bottom])$\\
+            $[cx,cy,w,h]$
+        \item[$ \bullet $] 交并比(IoU)
+            交并比是指两个矩形的交集与并集的面积之比$IoU=\frac{|A\cap B|}{|A\cup B|}$,
+            实现是采用第二种矩形表示进行实现$A[l_A,t_A,r_A,b_A],B[l_B,t_B,r_B,b_B]$:\\
+
+            $S_A=(r_A-l_A)\times(b_A-t_A)$\\
+            $S_B=(r_B-l_B)\times(b_B-t_B)$\\
+            $W_{AB}=(min(r_A,r_B)-max(l_A,l_B))$\\
+            $H_{AB}=(min(b_A,b_B)-max(t_A,t_B))$\\
+            if $ W_{AB}<0$ or $H_{AB}<0$ then $IoU = 0$\\
+            else $IoU=\frac{W_{AB}\times H_{AB}}{S_A+S_B-W_{AB}\times H_{AB}}$
+
+    \end{itemize}
 \end{frame}
 
 
 \begin{frame}
     \noindent\large\textbf{常见数据集}
 
-%    \begin{itemize}
-%    \item[$ \bullet $]  包含图像和标签（掩码、mask、Ground Truth）
-%
-%    %\vspace{1em}
-%    \item[$ \bullet $]  图像与标签大小相同
-%
-%    %\vspace{1em}
-%    \item[$ \bullet $]  图像与标签的像素一一对应
-%
-%    %\vspace{1em}
-%    \item[$ \bullet $] 标签的形式多种多样，包括图像、描述文件、表格等形式
-%    \end{itemize}
-%
-%    \vspace{1em}
-%    \noindent\large\textbf{常见数据集}
+    %    \begin{itemize}
+    %    \item[$ \bullet $]  包含图像和标签（掩码、mask、Ground Truth）
+    %
+    %    %\vspace{1em}
+    %    \item[$ \bullet $]  图像与标签大小相同
+    %
+    %    %\vspace{1em}
+    %    \item[$ \bullet $]  图像与标签的像素一一对应
+    %
+    %    %\vspace{1em}
+    %    \item[$ \bullet $] 标签的形式多种多样，包括图像、描述文件、表格等形式
+    %    \end{itemize}
+    %
+    %    \vspace{1em}
+    %    \noindent\large\textbf{常见数据集}
 
     \vspace{1em} \small
     Common Objects in COntext（COCO）、PASCAL Visual Object Classes（PASAL）、
