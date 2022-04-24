@@ -36,7 +36,9 @@
     \end{itemize}
     \vspace{1em}
     \begin{figure}
-        \includegraphics[width=0.3\linewidth]{box.png}
+        \subfloat[box]{\includegraphics[width=0.4\linewidth]{box.png}}
+        \hspace{1cm}
+        \subfloat[Object Detection]{\includegraphics[width=0.4\linewidth]{obd1.jpg}}
     \end{figure}
 \end{frame}
 
@@ -51,13 +53,18 @@
         \item[$ \bullet $] 交并比(IoU)
             交并比是指两个矩形的交集与并集的面积之比$IoU=\frac{|A\cap B|}{|A\cup B|}$,
             实现是采用第二种矩形表示进行实现$A[l_A,t_A,r_A,b_A],B[l_B,t_B,r_B,b_B]$:\\
-
             $S_A=(r_A-l_A)\times(b_A-t_A)$\\
             $S_B=(r_B-l_B)\times(b_B-t_B)$\\
             $W_{AB}=(min(r_A,r_B)-max(l_A,l_B))$\\
             $H_{AB}=(min(b_A,b_B)-max(t_A,t_B))$\\
             if $ W_{AB}<0$ or $H_{AB}<0$ then $IoU = 0$\\
             else $IoU=\frac{W_{AB}\times H_{AB}}{S_A+S_B-W_{AB}\times H_{AB}}$
+            % \hspace{10cm}
+            \vspace{-3.5cm}
+            \begin{figure}
+                \hspace{6cm}
+                \includegraphics[width=0.4\linewidth]{iou.png}
+            \end{figure}
 
     \end{itemize}
 \end{frame}
@@ -83,10 +90,7 @@
     %    \noindent\large\textbf{常见数据集}
 
     \vspace{1em} \small
-    Common Objects in COntext（COCO）、PASCAL Visual Object Classes（PASAL）、
-    The Cityscapes Dataset、The Cambridge-driving Labeled Video Database（CamVid）、
-    Stanford Background Dataset、Barcelona Dataset、Microsoft Research in Cambridge、
-    LITS Liver Tumor Segmentation Dataset、ISBI Challenge
+    Common Objects in COntext（COCO）、PASCAL Visual Object Classes（PASAL）
 \end{frame}
 
 

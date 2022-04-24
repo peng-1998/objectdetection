@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2021/Arch Linux) (preloaded format=xelatex 2022.4.11)  20 APR 2022 14:51
+This is XeTeX, Version 3.141592653-2.6-0.999993 (TeX Live 2021/Arch Linux) (preloaded format=xelatex 2022.4.11)  21 APR 2022 08:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1486,9 +1486,14 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ]
 File: figures//box.png Graphic file (type bmp)
 <figures//box.png>
+File: figures//obd1.jpg Graphic file (type bmp)
+<figures//obd1.jpg>
  [6
 
-] [7
+]
+File: figures//iou.png Graphic file (type bmp)
+<figures//iou.png>
+ [7
 
 ] [8
 
@@ -1680,10 +1685,10 @@ Package rerunfilecheck Info: File `objectdetection.out' has not changed.
 (rerunfilecheck)             Checksum: E382CDF73E9AE482F8A81D9204F45074;855.
  ) 
 Here is how much of TeX's memory you used:
- 34686 strings out of 476257
- 741340 string characters out of 5816919
+ 34705 strings out of 476257
+ 741712 string characters out of 5816919
  1295495 words of memory out of 5000000
- 54595 multiletter control sequences out of 15000+600000
+ 54612 multiletter control sequences out of 15000+600000
  415680 words of font info for 100 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  99i,17n,133p,469b,820s stack positions out of 5000i,500n,10000p,200000b,80000s
