@@ -1,0 +1,193 @@
+\section{Faster R-CNN}
+\begin{frame}[allowframebreaks]
+    \frametitle{\textsc{目录}} \vspace{-0.3cm}
+    \begin{spacing}{0.0}
+        \tableofcontents[currentsection,hideallsubsections]
+    \end{spacing}   % 若不想要目录, 注释掉该句
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{Faster R-CNN}\\
+    \vspace{0.5em}
+    Faster R-CNN是一个较为成熟的二阶段Anchor-based目标检测算法\\
+    \vspace{0.5em}
+    \begin{figure}
+        \includegraphics[width=\linewidth]{fasterrcnn.jpg}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{预设锚框}\\
+    \vspace{0.5em}
+    Faster R-CNN中设置了3种比例的锚框,1:1,1:2,2:1. 并且使用了多种尺寸,$64^2,128^2,256^2,512^2\cdots$\\
+    \begin{figure}
+
+        \subfloat{\includegraphics[width=0.3\linewidth]{anchors.jpg}}
+        \hspace{0.4cm}
+        \subfloat{\includegraphics[width=0.3\linewidth]{anchorsposition.png}}
+        \hspace{0.4cm}
+        \subfloat{\includegraphics[width=0.3\linewidth]{uTools_1650882249335.png}}
+    \end{figure}
+    \vspace{0.5em}
+    \noindent\large\textbf{锚框平铺}\\
+    \vspace{0.5em}
+    将图片分割为$P\times Q$的网格,在每一个网格上应用预设锚框,则锚框数量一共有$3\times P\times Q\times S$,其中$S$为应用的尺寸的数量.
+\end{frame}
+\begin{frame}
+    \large
+    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{tileAnchors}\textcolor{vscodebracket}{(}\\
+    \qquad\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\\
+    \qquad\textcolor{vscodeparameter}{gridsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+    \qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]}\\
+    \qquad\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+    \vspace{0.2em}
+    \qquad\textcolor{vscodeparameter}{baselength}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{)}/\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{gridsize}\textcolor{vscodebracket}{)}\\
+    \vspace{0.2em}
+    \qquad\textcolor{vscodeparameter}{basepos}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{meshgrid}\textcolor{vscodecomment}{(}\\
+    \qquad\qquad\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{arange}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}/\textcolor{vscodecomment}{2},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)},\\
+    \qquad\qquad\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{arange}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}/\textcolor{vscodecomment}{2},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)},\\
+    \qquad\qquad\textcolor{vscodeparameter}{indexing}=\textcolor{vscode3bracket}{'xy'}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{dim}=-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}  \textcolor{vscodecomment}{\# (H,W,2)}\\
+    \vspace{0.2em}
+    \qquad\textcolor{vscodeparameter}{baseanc}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{(}*\textcolor{vscodeparameter}{basepos}.\textcolor{vscodeparameter}{shape}\textcolor{vscode3bracket}{[}:\textcolor{vscodecomment}{2}\textcolor{vscode3bracket}{]},\textcolor{vscodeparameter}{anchors}.\textcolor{vscodeparameter}{shape}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscode3bracket}{]},\textcolor{vscodecomment}{4}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+    \vspace{0.2em}
+    \qquad\textcolor{vscodeparameter}{baseanc}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{basepos}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{)}-\textcolor{vscodeparameter}{anchors}/\textcolor{vscodecomment}{2}\\
+    \vspace{0.2em}
+    \qquad\textcolor{vscodeparameter}{baseanc}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{basepos}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{)}+\textcolor{vscodeparameter}{anchors}/\textcolor{vscodecomment}{2}\\
+    \vspace{0.2em}
+    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{baseanc}
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{边框回归}\\
+    \vspace{0.5em}
+    在将锚框平铺到整张图像后,预设锚框基本上覆盖了所有目标,但是还不够精确,而边框回归让预测框更加准确.Faster R-CNN使用了如下形式的变换将锚框$A$映射到预测框$G$:
+    \vspace{1.5em}
+    \begin{flalign*}
+        G_x & =A_wd_x(A)+A_x    \\
+        G_y & =A_gd_y(A)+A_y    \\
+        G_w & =A_wexp(d_w(A))   \\
+        G_h & =A_hexp(d_h(A)) &
+    \end{flalign*}
+    \vspace{-4cm}
+    \begin{figure}
+        \hspace{4.7cm}
+        \includegraphics[width=0.4\linewidth]{reg.jpg}
+    \end{figure}
+    因此对预测框的校准问题就变成了对$d_x(A) d_y(A) d_w(A) d_y(A)$的回归问题
+
+\end{frame}
+
+\begin{frame}
+    \large
+    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{calculatedxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+    \vspace{0.2em}
+    \qquad\textcolor{vscodecomment}{\# anchors:(...,4) boxes:(...,4)}\\
+
+    \qquad\textcolor{vscodeparameter}{dxywh}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros\_like}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}...,:\textcolor{vscodecomment}{2]}-\textcolor{vscodecomment}{anchors}\textcolor{vscodecomment}{[}...,:\textcolor{vscodecomment}{2]}\textcolor{vscodebracket}{)}/\textcolor{vscodeparameter}{anchors}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+
+    \qquad\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{log}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}/\textcolor{vscodeparameter}{anchors}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodeparameter}{dxywh}=\textcolor{vscodeparameter}{dxywh}.\textcolor{vscodefuncation}{nan\_to\_num}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{)}
+
+    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{dxywh}
+
+    \vspace{0.5em}
+
+    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{applydxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{dxywh}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+
+    \qquad\textcolor{vscodecomment}{\# anchors:(...,4) dxywh:(...,4)}\\
+
+    \qquad\textcolor{vscodeparameter}{matrix}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros}\textcolor{vscodebracket}{(}*\textcolor{vscodeparameter}{dxywh}.\textcolor{vscodeparameter}{shape},\textcolor{vscodecomment}{4}\textcolor{vscodebracket}{)}
+
+    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}.\textcolor{vscodefuncation}{diag\_embed}\textcolor{vscodebracket}{()}\\
+
+    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodecomment}{1}-\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+
+    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{exp}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{dxywh}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{diag\_embed}\textcolor{vscodebracket}{()}\\
+
+    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodecomment}{1}-\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+
+    \qquad\textcolor{vscodeparameter}{anchors}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{matrix}@\textcolor{vscodeparameter}{anchors}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodecomment}{(}-\textcolor{vscodecomment}{1)}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{squeeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{anchors}
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{RPN层}\\
+    \vspace{0.5em}
+    RPN 层的主要工作是预测预设框内是否有目标物体以及预测从预设框到预测框的变换$d_{xywh}$
+    \begin{figure}
+        \includegraphics[width=0.8\linewidth]{RPNlayer.png}
+    \end{figure}
+    其中预设框内是否有目标物体是一个二分类问题,使用通道为$2K$的$1\times 1$卷积实现并且在reshape后经过Softmax运算,预测变换使用的是通道为$4K$的$1\times 1$卷积
+
+
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{Proposal层}\\
+    \vspace{0.5em}
+    Proposal Layer的工作是根据RPN层的预测信息挑选出合适的预测框,算法如下:\\
+    \vspace{0.2em}
+    输入:预设框内有物体的置信度,预设框,变换的回归估计
+    \vspace{0.2em}
+    \begin{itemize}
+        \item[1]根据置信度从大到小排序,选出置信度最高的N个预测框
+        \item[2]使用变换的回归估计对预设框进行修正
+        \item[3]修正超出图像边界的预测框
+        \item[4]剔除过小的预测框
+        \item[5]对剩余预测框执行非极大值抑制(NMS)
+    \end{itemize}
+    \vspace{0.5em}
+    到这一步已经完成了"在哪里"和"有哪些"的任务,后面的工作就是分类以及对结果的轻微修正
+\end{frame}
+
+\begin{frame}
+    \large
+    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{proposal}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchs}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{boxreg}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{score}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{N}:\textcolor{vscodeclass}{int},\\
+    \qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\textcolor{vscodeparameter}{minsize}:\textcolor{vscodeclass}{int},\textcolor{vscodeparameter}{threshold}:\textcolor{vscodeclass}{float}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+
+    \qquad\textcolor{vscodecomment}{\# anchors:(N,H,W,K,4) boxreg:(N,H,W,K,4) score:{N,H,W,K}}\\
+
+    \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodeparameter}{score}>\textcolor{vscodecomment}{0.5}\\
+
+    \qquad\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodereturn}{if} \textcolor{vscodeparameter}{score}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}>\textcolor{vscodeparameter}{N}:\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodeparameter}{score}.\textcolor{vscodefuncation}{topk}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{N}\textcolor{vscodebracket}{)}.\textcolor{vscodeparameter}{indices}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}
+
+    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{applydxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{boxreg}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{clip\_boxes\_to\_image}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodefuncation}{remove\_small\_boxes}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{minsize}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodefuncation}{nms}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{minsize},\textcolor{vscodeparameter}{threshold}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{[}\textcolor{vscodeparameter}{idx}\textcolor{vscodebracket}{]}.\textcolor{vscodefuncation}{clone}\textcolor{vscodebracket}{(}\textcolor{vscodebracket}{)}
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{ROI Pooling}\\
+    \vspace{0.5em}
+    Region of interest pooling是对选定的区域进行采样的过程,在得到预测框后需要将区域的图像输入CNN分类器当中,这要求这些区域的分辨率保持一致.\\
+    
+    首先,Faster R-CNN是在下采样的特征图上进行采样的,就需要把预测框转换为特征图的尺寸.\\
+
+    接下来,对预测框进行取整来对特征图进行切片.
+
+    将特征图切片进行池化
+\end{frame}
