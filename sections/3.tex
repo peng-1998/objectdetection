@@ -10,7 +10,7 @@
 \begin{frame}
     目标检测有两个主要流派:Anchor-based与Anchor-Free,两类算法的主要区别在于算法当中是否有预设锚框\\
     \begin{itemize}
-        \item[$ \bullet $] Anchor-based:YOLOv2、SSD、Faster \;R-CNN
+        \item[$ \bullet $] Anchor-based:YOLOv3、SSD、Faster \;R-CNN
         \item[$ \bullet $] Anchor-Free:YOLOv1、CornerNet、CenterNet、FCOS
     \end{itemize}
 
@@ -22,7 +22,7 @@
     \end{itemize}
 
     \vspace{1em}
-    在后面的算法当中将介绍二阶段Anchor-based算法Faster\quad R-CNN和一阶段Anchor-Free算法YOLOv1\\
+    在后面的算法当中将介绍二阶段Anchor-based算法Faster\; R-CNN和一阶段Anchor-Free算法YOLOv1\\
 
 \end{frame}
 
@@ -55,7 +55,7 @@
 
 \begin{frame}
     \large
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{box\_iou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}: \textcolor{vscodeclass}{Tensor}, \textcolor{vscodeparameter}{boxes2}: \textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}: \textcolor{vscodeclass}{Tensor}, \textcolor{vscodeparameter}{boxes2}: \textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
     \vspace{0.2em}
     \qquad\textcolor{vscodecomment}{\# boxes1:(N,4) boxes2:(M,4) use 'xyxy'}\\
     \vspace{0.2em}
@@ -152,7 +152,7 @@
     \vspace{0.2em}
     \qquad\qquad\textcolor{vscodeparameter}{temp\_boxes}=\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{indexes}\textcolor{vscodecomment}{]}\\
     \vspace{0.2em}
-    \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodefuncation}{box\_iou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[}:\textcolor{vscodecomment}{1]},\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[1}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}\\
+    \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[}:\textcolor{vscodecomment}{1]},\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[1}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}\\
     \vspace{0.2em}
     \qquad\qquad\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{indexes}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}:\textcolor{vscodebracket}{][}\textcolor{vscodeparameter}{ious}<=\textcolor{vscodeparameter}{threshold}\textcolor{vscodebracket}{]}\\
     \vspace{0.2em}

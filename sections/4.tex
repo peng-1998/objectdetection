@@ -184,10 +184,159 @@
     \noindent\large\textbf{ROI Pooling}\\
     \vspace{0.5em}
     Region of interest pooling是对选定的区域进行采样的过程,在得到预测框后需要将区域的图像输入CNN分类器当中,这要求这些区域的分辨率保持一致.\\
-    
-    首先,Faster R-CNN是在下采样的特征图上进行采样的,就需要把预测框转换为特征图的尺寸.\\
+    \vspace{0.2em}
+    首先,Faster R-CNN是在下采样后的特征图上进行采样的,因此需要把预测框转换为特征图的尺寸.\\
+    \vspace{0.2em}
+    接下来,对预测框进行取整来对特征图进行切片并将进行池化,使特征图切片的大小统一.这里使用自适应最大/平均池化来代替原论文的复杂池化过程.
+    \begin{figure}
+        \includegraphics[width=0.4\linewidth]{roipooling.png}
+    \end{figure}
+\end{frame}
 
-    接下来,对预测框进行取整来对特征图进行切片.
 
-    将特征图切片进行池化
+\begin{frame}
+    \large
+    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{roiPooling}\textcolor{vscodebracket}{(}\\
+    \qquad\textcolor{vscodeparameter}{feamap}:\textcolor{vscodeclass}{Tensor},\\
+    \qquad\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor},\\
+    \qquad\textcolor{vscodeparameter}{imgsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+    \qquad\textcolor{vscodeparameter}{outsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}:\\
+
+    \qquad\textcolor{vscodecomment}{\# feamap (1,C,H,W) boxes:(N,4)}\\
+
+    \qquad\textcolor{vscodeparameter}{h},\textcolor{vscodeparameter}{w}=\textcolor{vscodeparameter}{feamap}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}-\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+
+    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{imgsize},\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{w},\textcolor{vscodeparameter}{h}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{)}\\
+
+    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodeparameter}{boxes}.\textcolor{vscodefuncation}{floor}\textcolor{vscodebracket}{()}\\
+
+    \qquad\textcolor{vscodeparameter}{roiarea}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{cat}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{F}.\textcolor{vscodefuncation}{adaptive\_avg\_pool2d}\textcolor{vscode3bracket}{(}\\
+    \qquad\qquad\textcolor{vscodeparameter}{feamap}\textcolor{vscodebracket}{[}...,\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[1]}:\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[3]},\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[0]}:\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[2]}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{outsize}\textcolor{vscode3bracket}{)}\\
+    \qquad\qquad\textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{box} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\
+
+    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{roiarea}
+
+
+
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{第二阶段}\\
+    \vspace{0.5em}
+    第二阶段的任务是一个简单的分类+回归任务.
+    \begin{itemize}
+        \item[$ \bullet $]输 入:ROI区域特征图([M,C,H,W])
+        \item[$ \bullet $]网 络:卷积网络
+        \item[$ \bullet $]输出1:基于第一次预测框的更精确的预测框回归
+        \item[$ \bullet $]输出2:ROI区域物体类别
+    \end{itemize}
+    \begin{figure}
+        \includegraphics[width=0.6\linewidth]{uTools_1651760901375.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{训练过程}\\
+    \vspace{0.5em}
+    Faster R-CNN的特征提取器使用预训练的卷积网络(resnet18、vgg16等)
+    \begin{itemize}
+        \item[1]固定特征提取器,训练RPN层
+        \item[2]固定特征提取器和RPN,训练分割部分
+        \item[3]整体训练
+    \end{itemize}
+    在两个阶段的训练当中都有回归任务和分类任务,回归任务使用的是L1 Smooth Loss,分类使用CrossEntrpyLoss
+    $$
+        l = \begin{cases}
+            0.5 (y - \hat{y})^2 / \beta, & \text{if } |y - \hat{y}| < \beta \\
+            |y - \hat{y}| - 0.5 \beta,   & \text{otherwise }
+        \end{cases}
+    $$
+
+
+\end{frame}
+
+\begin{frame}
+    \vspace{0.5em}
+    \noindent\large\textbf{数据处理}\\
+    \vspace{0.5em}
+    在实际训练时,需要将原始数据格式转换成模型需要的输入或标签,这里以COCO数据集为例说明需要做哪些处理:
+    \begin{itemize}
+        \item[1]获取图片、定位框、目标分类标签
+        \item[2]将图片resize到指定大小方便训练
+        \item[3]将定位框转换到新的坐标系
+        \item[4]生成预设框内有/无物体的分类标签
+        \item[5]生成预设框到定位框的变换dxywh
+    \end{itemize}
+    其中生成的两种数据仅训练RPN层时使用,定位框与分类标签在训练第二阶段网络是使用.
+\end{frame}
+
+\begin{frame}
+    \textcolor{vscodedef}{class}  \textcolor{vscodeclass}{FasterRCNNCOCODataset}\textcolor{vscodebracket}{(}\textcolor{vscodeclass}{CocoDetection}\textcolor{vscodebracket}{)}:\\
+
+    \qquad\textcolor{vscodedef}{def} \textcolor{vscodefuncation}{\_\_init\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\\
+    \qquad\qquad\textcolor{vscodeparameter}{root}:\textcolor{vscodeclass}{str},\\
+    \qquad\qquad\textcolor{vscodeparameter}{annFile}:\textcolor{vscodeclass}{str},\\
+    \qquad\qquad\textcolor{vscodeparameter}{gridsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+    \qquad\qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+    \qquad\qquad\textcolor{vscodeparameter}{imagetransformers}:\textcolor{vscodeclass}{Optional}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{Callable}\textcolor{vscodecomment}{]},\\
+    \qquad\qquad\textcolor{vscodeparameter}{outputItems}:\textcolor{vscodeclass}{List}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{str}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}:\\
+
+    \qquad\qquad\textcolor{vscodeclass}{super}\textcolor{vscodebracket}{()}.\textcolor{vscodefuncation}{\_\_init\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{root},\textcolor{vscodeparameter}{annFile}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchorsWH}=\textcolor{vscodeparameter}{anchors}
+
+    \qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}=\textcolor{vscodefuncation}{tileAnchors}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{anchors}
+
+    \qquad\textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{getPositiveNegativeRegression}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}:\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}.\textcolor{vscodefuncation}{view}\textcolor{vscodecomment}{(}-\textcolor{vscodecomment}{1},\textcolor{vscodecomment}{4}\textcolor{vscodecomment}{)},\\
+    \qquad\qquad\qquad\textcolor{vscodefuncation}{box\_convert}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscode3bracket}{'xywh'},\textcolor{vscode3bracket}{'xyxy'}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodeparameter}{ious}.\textcolor{vscodefuncation}{reshape}\textcolor{vscodebracket}{(}*\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}.\textcolor{vscodeparameter}{shape}\textcolor{vscodecomment}{[}:\textcolor{vscodecomment}{3]},\textcolor{vscodeparameter}{boxes}.\textcolor{vscodeparameter}{shape}\textcolor{vscodecomment}{[0]}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{maxiou},\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{ious}.\textcolor{vscodefuncation}{max}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{currentgt}=\textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{[}\textcolor{vscodeparameter}{indexes}\textcolor{vscodebracket}{]}\\
+
+    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{maxiou}>\textcolor{vscodecomment}{0.7}\textcolor{vscode3bracket}{)}.\textcolor{vscodefuncation}{long}\textcolor{vscode3bracket}{()},\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{maxiou}<\textcolor{vscodecomment}{0.3}\textcolor{vscode3bracket}{)}.\textcolor{vscodefuncation}{long}\textcolor{vscode3bracket}{()}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)},\\
+    \qquad\qquad\qquad\textcolor{vscodefuncation}{calculatedxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{currentgt}\textcolor{vscodebracket}{)}
+
+\end{frame}
+
+\begin{frame}
+    \qquad\textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{\_\_getitem\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\textcolor{vscodeparameter}{index}:\textcolor{vscodeclass}{int}\textcolor{vscodebracket}{)}:\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{image},\textcolor{vscodeparameter}{target}=\textcolor{vscodeclass}{super}\textcolor{vscodebracket}{()}.\textcolor{vscodefuncation}{\_\_getitem\_\_}\textcolor{vscodebracket}{()}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeclass}{TF}.\textcolor{vscodefuncation}{to\_tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{h},\textcolor{vscodeparameter}{w}=\textcolor{vscodeparameter}{image}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}-\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeclass}{TF}.\textcolor{vscodefuncation}{resize}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image},\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscode3bracket}{]},\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscode3bracket}{]}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodereturn}{if} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagetransformers}:
+
+    \qquad\qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagetransformers}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{bboxes}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{\_}\textcolor{vscode3bracket}{['bbox']} \textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{target}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{bboxes}=\textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{w},\textcolor{vscodeparameter}{h}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize},\textcolor{vscodeparameter}{bboxes}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{category\_ids}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{\_}\textcolor{vscode3bracket}{['category\_id']} \textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{target}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodereturn}{if} \textcolor{vscode3bracket}{'positive\_negative'} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{outputItems}:\\
+
+    \qquad\qquad\qquad\textcolor{vscodeparameter}{positive\_negative},\textcolor{vscodeparameter}{regression}=\\
+
+    \qquad\qquad\qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodefuncation}{getPositiveNegativeRegression}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{bboxes}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodeparameter}{result}=\textcolor{vscodebracket}{[]}\\
+
+    \qquad\qquad\textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{outputItems}:\\
+
+    \qquad\qquad\qquad\textcolor{vscodeparameter}{result}.\textcolor{vscodefuncation}{append}\textcolor{vscodebracket}{(}\textcolor{vscodefuncation}{eval}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{\_}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+
+    \qquad\qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{result}
 \end{frame}
