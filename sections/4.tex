@@ -17,6 +17,21 @@
     \end{figure}
 \end{frame}
 
+\begin{frame}[allowframebreaks]
+    \vspace{-0.2cm}
+    {\noindent\large\textbf{实现要点}}
+    \vspace{0.4cm}
+    \begin{itemize}
+        \item[$ \bullet $] 锚框平铺
+        \item[$ \bullet $] 边框回归,计算与变换
+        \item[$ \bullet $] Proposal 筛选预测框
+        \item[$ \bullet $] ROI Pooling 特征图采样
+        \item[$ \bullet $] 训练过程
+        \item[$ \bullet $] 数据处理
+    \end{itemize}
+
+\end{frame}
+
 \begin{frame}
     \vspace{0.5em}
     \noindent\large\textbf{预设锚框}\\
@@ -35,29 +50,29 @@
     \vspace{0.5em}
     将图片分割为$P\times Q$的网格,在每一个网格上应用预设锚框,则锚框数量一共有$3\times P\times Q\times S$,其中$S$为应用的尺寸的数量.
 \end{frame}
-\begin{frame}
-    \large
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{tileAnchors}\textcolor{vscodebracket}{(}\\
-    \qquad\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\\
-    \qquad\textcolor{vscodeparameter}{gridsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
-    \qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]}\\
-    \qquad\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{baselength}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{)}/\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{gridsize}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{basepos}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{meshgrid}\textcolor{vscodecomment}{(}\\
-    \qquad\qquad\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{arange}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}/\textcolor{vscodecomment}{2},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)},\\
-    \qquad\qquad\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{arange}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}/\textcolor{vscodecomment}{2},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)},\\
-    \qquad\qquad\textcolor{vscodeparameter}{indexing}=\textcolor{vscode3bracket}{'xy'}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{dim}=-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}  \textcolor{vscodecomment}{\# (H,W,2)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{baseanc}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{(}*\textcolor{vscodeparameter}{basepos}.\textcolor{vscodeparameter}{shape}\textcolor{vscode3bracket}{[}:\textcolor{vscodecomment}{2}\textcolor{vscode3bracket}{]},\textcolor{vscodeparameter}{anchors}.\textcolor{vscodeparameter}{shape}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscode3bracket}{]},\textcolor{vscodecomment}{4}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{baseanc}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{basepos}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{)}-\textcolor{vscodeparameter}{anchors}/\textcolor{vscodecomment}{2}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{baseanc}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{basepos}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{)}+\textcolor{vscodeparameter}{anchors}/\textcolor{vscodecomment}{2}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{baseanc}
-\end{frame}
+% \begin{frame}
+%     \large
+%     \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{tileAnchors}\textcolor{vscodebracket}{(}\\
+%     \qquad\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\\
+%     \qquad\textcolor{vscodeparameter}{gridsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+%     \qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]}\\
+%     \qquad\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{baselength}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{)}/\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{gridsize}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{basepos}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{meshgrid}\textcolor{vscodecomment}{(}\\
+%     \qquad\qquad\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{arange}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}/\textcolor{vscodecomment}{2},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)},\\
+%     \qquad\qquad\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{arange}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}/\textcolor{vscodecomment}{2},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{baselength}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)},\\
+%     \qquad\qquad\textcolor{vscodeparameter}{indexing}=\textcolor{vscode3bracket}{'xy'}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{dim}=-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}  \textcolor{vscodecomment}{\# (H,W,2)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{baseanc}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{(}*\textcolor{vscodeparameter}{basepos}.\textcolor{vscodeparameter}{shape}\textcolor{vscode3bracket}{[}:\textcolor{vscodecomment}{2}\textcolor{vscode3bracket}{]},\textcolor{vscodeparameter}{anchors}.\textcolor{vscodeparameter}{shape}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscode3bracket}{]},\textcolor{vscodecomment}{4}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{baseanc}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{basepos}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{)}-\textcolor{vscodeparameter}{anchors}/\textcolor{vscodecomment}{2}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{baseanc}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{basepos}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{)}+\textcolor{vscodeparameter}{anchors}/\textcolor{vscodecomment}{2}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{baseanc}
+% \end{frame}
 
 \begin{frame}
     \vspace{0.5em}
@@ -80,42 +95,42 @@
 
 \end{frame}
 
-\begin{frame}
-    \large
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{calculatedxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodecomment}{\# anchors:(...,4) boxes:(...,4)}\\
+% \begin{frame}
+%     \large
+%     \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{calculatedxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodecomment}{\# anchors:(...,4) boxes:(...,4)}\\
 
-    \qquad\textcolor{vscodeparameter}{dxywh}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros\_like}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{dxywh}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros\_like}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}...,:\textcolor{vscodecomment}{2]}-\textcolor{vscodecomment}{anchors}\textcolor{vscodecomment}{[}...,:\textcolor{vscodecomment}{2]}\textcolor{vscodebracket}{)}/\textcolor{vscodeparameter}{anchors}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+%     \qquad\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}...,:\textcolor{vscodecomment}{2]}-\textcolor{vscodecomment}{anchors}\textcolor{vscodecomment}{[}...,:\textcolor{vscodecomment}{2]}\textcolor{vscodebracket}{)}/\textcolor{vscodeparameter}{anchors}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
 
-    \qquad\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{log}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}/\textcolor{vscodeparameter}{anchors}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{log}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}/\textcolor{vscodeparameter}{anchors}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodeparameter}{dxywh}=\textcolor{vscodeparameter}{dxywh}.\textcolor{vscodefuncation}{nan\_to\_num}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{)}
+%     \qquad\textcolor{vscodeparameter}{dxywh}=\textcolor{vscodeparameter}{dxywh}.\textcolor{vscodefuncation}{nan\_to\_num}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{)}
 
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{dxywh}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{dxywh}
 
-    \vspace{0.5em}
+%     \vspace{0.5em}
 
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{applydxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{dxywh}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+%     \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{applydxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{dxywh}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
 
-    \qquad\textcolor{vscodecomment}{\# anchors:(...,4) dxywh:(...,4)}\\
+%     \qquad\textcolor{vscodecomment}{\# anchors:(...,4) dxywh:(...,4)}\\
 
-    \qquad\textcolor{vscodeparameter}{matrix}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros}\textcolor{vscodebracket}{(}*\textcolor{vscodeparameter}{dxywh}.\textcolor{vscodeparameter}{shape},\textcolor{vscodecomment}{4}\textcolor{vscodebracket}{)}
+%     \qquad\textcolor{vscodeparameter}{matrix}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{zeros}\textcolor{vscodebracket}{(}*\textcolor{vscodeparameter}{dxywh}.\textcolor{vscodeparameter}{shape},\textcolor{vscodecomment}{4}\textcolor{vscodebracket}{)}
 
-    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}.\textcolor{vscodefuncation}{diag\_embed}\textcolor{vscodebracket}{()}\\
+%     \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeparameter}{dxywh}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}.\textcolor{vscodefuncation}{diag\_embed}\textcolor{vscodebracket}{()}\\
 
-    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodecomment}{1}-\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+%     \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodecomment}{1}-\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,:\textcolor{vscodecomment}{2},\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
 
-    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{exp}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{dxywh}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{diag\_embed}\textcolor{vscodebracket}{()}\\
+%     \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{exp}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{dxywh}\textcolor{vscodecomment}{[}...,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{diag\_embed}\textcolor{vscodebracket}{()}\\
 
-    \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodecomment}{1}-\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+%     \qquad\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,:\textcolor{vscodecomment}{2}\textcolor{vscodebracket}{]}=\textcolor{vscodecomment}{1}-\textcolor{vscodeparameter}{matrix}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{2}:,\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
 
-    \qquad\textcolor{vscodeparameter}{anchors}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{matrix}@\textcolor{vscodeparameter}{anchors}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodecomment}{(}-\textcolor{vscodecomment}{1)}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{squeeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{anchors}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{matrix}@\textcolor{vscodeparameter}{anchors}.\textcolor{vscodefuncation}{unsqueeze}\textcolor{vscodecomment}{(}-\textcolor{vscodecomment}{1)}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{squeeze}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{anchors}
-\end{frame}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{anchors}
+% \end{frame}
 
 \begin{frame}
     \vspace{0.5em}
@@ -149,35 +164,35 @@
     到这一步已经完成了"在哪里"和"有哪些"的任务,后面的工作就是分类以及对结果的轻微修正
 \end{frame}
 
-\begin{frame}
-    \large
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{proposal}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchs}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{boxreg}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{score}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{N}:\textcolor{vscodeclass}{int},\\
-    \qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\textcolor{vscodeparameter}{minsize}:\textcolor{vscodeclass}{int},\textcolor{vscodeparameter}{threshold}:\textcolor{vscodeclass}{float}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+% \begin{frame}
+%     \large
+%     \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{proposal}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchs}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{boxreg}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{score}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{N}:\textcolor{vscodeclass}{int},\\
+%     \qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\textcolor{vscodeparameter}{minsize}:\textcolor{vscodeclass}{int},\textcolor{vscodeparameter}{threshold}:\textcolor{vscodeclass}{float}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
 
-    \qquad\textcolor{vscodecomment}{\# anchors:(N,H,W,K,4) boxreg:(N,H,W,K,4) score:{N,H,W,K}}\\
+%     \qquad\textcolor{vscodecomment}{\# anchors:(N,H,W,K,4) boxreg:(N,H,W,K,4) score:{N,H,W,K}}\\
 
-    \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodeparameter}{score}>\textcolor{vscodecomment}{0.5}\\
+%     \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodeparameter}{score}>\textcolor{vscodecomment}{0.5}\\
 
-    \qquad\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodereturn}{if} \textcolor{vscodeparameter}{score}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}>\textcolor{vscodeparameter}{N}:\\
+%     \qquad\textcolor{vscodereturn}{if} \textcolor{vscodeparameter}{score}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}>\textcolor{vscodeparameter}{N}:\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodeparameter}{score}.\textcolor{vscodefuncation}{topk}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{N}\textcolor{vscodebracket}{)}.\textcolor{vscodeparameter}{indices}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodeparameter}{score}.\textcolor{vscodefuncation}{topk}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{N}\textcolor{vscodebracket}{)}.\textcolor{vscodeparameter}{indices}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}
+%     \qquad\qquad\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{anchs},\textcolor{vscodeparameter}{boxreg},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}
 
-    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{applydxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{boxreg}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{applydxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{boxreg}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{clip\_boxes\_to\_image}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{clip\_boxes\_to\_image}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{imagesize}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodefuncation}{remove\_small\_boxes}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{minsize}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodefuncation}{remove\_small\_boxes}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{minsize}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{score}=\textcolor{vscodefuncation}{applyIndex}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{idx},\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{score}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodefuncation}{nms}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{minsize},\textcolor{vscodeparameter}{threshold}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{idx}=\textcolor{vscodefuncation}{nms}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscodeparameter}{minsize},\textcolor{vscodeparameter}{threshold}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{[}\textcolor{vscodeparameter}{idx}\textcolor{vscodebracket}{]}.\textcolor{vscodefuncation}{clone}\textcolor{vscodebracket}{(}\textcolor{vscodebracket}{)}
-\end{frame}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{[}\textcolor{vscodeparameter}{idx}\textcolor{vscodebracket}{]}.\textcolor{vscodefuncation}{clone}\textcolor{vscodebracket}{(}\textcolor{vscodebracket}{)}
+% \end{frame}
 
 \begin{frame}
     \vspace{0.5em}
@@ -194,31 +209,31 @@
 \end{frame}
 
 
-\begin{frame}
-    \large
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{roiPooling}\textcolor{vscodebracket}{(}\\
-    \qquad\textcolor{vscodeparameter}{feamap}:\textcolor{vscodeclass}{Tensor},\\
-    \qquad\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor},\\
-    \qquad\textcolor{vscodeparameter}{imgsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
-    \qquad\textcolor{vscodeparameter}{outsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}:\\
+% \begin{frame}
+%     \large
+%     \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{roiPooling}\textcolor{vscodebracket}{(}\\
+%     \qquad\textcolor{vscodeparameter}{feamap}:\textcolor{vscodeclass}{Tensor},\\
+%     \qquad\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor},\\
+%     \qquad\textcolor{vscodeparameter}{imgsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+%     \qquad\textcolor{vscodeparameter}{outsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}:\\
 
-    \qquad\textcolor{vscodecomment}{\# feamap (1,C,H,W) boxes:(N,4)}\\
+%     \qquad\textcolor{vscodecomment}{\# feamap (1,C,H,W) boxes:(N,4)}\\
 
-    \qquad\textcolor{vscodeparameter}{h},\textcolor{vscodeparameter}{w}=\textcolor{vscodeparameter}{feamap}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}-\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+%     \qquad\textcolor{vscodeparameter}{h},\textcolor{vscodeparameter}{w}=\textcolor{vscodeparameter}{feamap}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}-\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
 
-    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{imgsize},\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{w},\textcolor{vscodeparameter}{h}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{)}\\
+%     \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{imgsize},\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{w},\textcolor{vscodeparameter}{h}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{)}\\
 
-    \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodeparameter}{boxes}.\textcolor{vscodefuncation}{floor}\textcolor{vscodebracket}{()}\\
+%     \qquad\textcolor{vscodeparameter}{boxes}=\textcolor{vscodeparameter}{boxes}.\textcolor{vscodefuncation}{floor}\textcolor{vscodebracket}{()}\\
 
-    \qquad\textcolor{vscodeparameter}{roiarea}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{cat}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{F}.\textcolor{vscodefuncation}{adaptive\_avg\_pool2d}\textcolor{vscode3bracket}{(}\\
-    \qquad\qquad\textcolor{vscodeparameter}{feamap}\textcolor{vscodebracket}{[}...,\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[1]}:\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[3]},\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[0]}:\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[2]}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{outsize}\textcolor{vscode3bracket}{)}\\
-    \qquad\qquad\textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{box} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\
+%     \qquad\textcolor{vscodeparameter}{roiarea}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{cat}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{F}.\textcolor{vscodefuncation}{adaptive\_avg\_pool2d}\textcolor{vscode3bracket}{(}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{feamap}\textcolor{vscodebracket}{[}...,\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[1]}:\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[3]},\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[0]}:\textcolor{vscodeparameter}{box}\textcolor{vscodecomment}{[2]}\textcolor{vscodebracket}{]},\textcolor{vscodeparameter}{outsize}\textcolor{vscode3bracket}{)}\\
+%     \qquad\qquad\textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{box} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\
 
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{roiarea}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{roiarea}
 
 
 
-\end{frame}
+% \end{frame}
 
 \begin{frame}
     \vspace{0.5em}
@@ -269,74 +284,74 @@
         \item[4]生成预设框内有/无物体的分类标签
         \item[5]生成预设框到定位框的变换dxywh
     \end{itemize}
-    其中生成的两种数据仅训练RPN层时使用,定位框与分类标签在训练第二阶段网络是使用.
+    其中生成的两种数据仅训练RPN层时使用,定位框与分类标签在训练第二阶段网络时使用.
 \end{frame}
 
-\begin{frame}
-    \textcolor{vscodedef}{class}  \textcolor{vscodeclass}{FasterRCNNCOCODataset}\textcolor{vscodebracket}{(}\textcolor{vscodeclass}{CocoDetection}\textcolor{vscodebracket}{)}:\\
+% \begin{frame}
+%     \textcolor{vscodedef}{class}  \textcolor{vscodeclass}{FasterRCNNCOCODataset}\textcolor{vscodebracket}{(}\textcolor{vscodeclass}{CocoDetection}\textcolor{vscodebracket}{)}:\\
 
-    \qquad\textcolor{vscodedef}{def} \textcolor{vscodefuncation}{\_\_init\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\\
-    \qquad\qquad\textcolor{vscodeparameter}{root}:\textcolor{vscodeclass}{str},\\
-    \qquad\qquad\textcolor{vscodeparameter}{annFile}:\textcolor{vscodeclass}{str},\\
-    \qquad\qquad\textcolor{vscodeparameter}{gridsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
-    \qquad\qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
-    \qquad\qquad\textcolor{vscodeparameter}{imagetransformers}:\textcolor{vscodeclass}{Optional}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{Callable}\textcolor{vscodecomment}{]},\\
-    \qquad\qquad\textcolor{vscodeparameter}{outputItems}:\textcolor{vscodeclass}{List}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{str}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}:\\
+%     \qquad\textcolor{vscodedef}{def} \textcolor{vscodefuncation}{\_\_init\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\\
+%     \qquad\qquad\textcolor{vscodeparameter}{root}:\textcolor{vscodeclass}{str},\\
+%     \qquad\qquad\textcolor{vscodeparameter}{annFile}:\textcolor{vscodeclass}{str},\\
+%     \qquad\qquad\textcolor{vscodeparameter}{gridsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+%     \qquad\qquad\textcolor{vscodeparameter}{imagesize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+%     \qquad\qquad\textcolor{vscodeparameter}{imagetransformers}:\textcolor{vscodeclass}{Optional}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{Callable}\textcolor{vscodecomment}{]},\\
+%     \qquad\qquad\textcolor{vscodeparameter}{outputItems}:\textcolor{vscodeclass}{List}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{str}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}:\\
 
-    \qquad\qquad\textcolor{vscodeclass}{super}\textcolor{vscodebracket}{()}.\textcolor{vscodefuncation}{\_\_init\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{root},\textcolor{vscodeparameter}{annFile}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeclass}{super}\textcolor{vscodebracket}{()}.\textcolor{vscodefuncation}{\_\_init\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{root},\textcolor{vscodeparameter}{annFile}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchorsWH}=\textcolor{vscodeparameter}{anchors}
+%     \qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchorsWH}=\textcolor{vscodeparameter}{anchors}
 
-    \qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}=\textcolor{vscodefuncation}{tileAnchors}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{anchors}
+%     \qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}=\textcolor{vscodefuncation}{tileAnchors}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{anchors}
 
-    \qquad\textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{getPositiveNegativeRegression}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}:\\
+%     \qquad\textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{getPositiveNegativeRegression}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}:\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}.\textcolor{vscodefuncation}{view}\textcolor{vscodecomment}{(}-\textcolor{vscodecomment}{1},\textcolor{vscodecomment}{4}\textcolor{vscodecomment}{)},\\
-    \qquad\qquad\qquad\textcolor{vscodefuncation}{box\_convert}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscode3bracket}{'xywh'},\textcolor{vscode3bracket}{'xyxy'}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}.\textcolor{vscodefuncation}{view}\textcolor{vscodecomment}{(}-\textcolor{vscodecomment}{1},\textcolor{vscodecomment}{4}\textcolor{vscodecomment}{)},\\
+%     \qquad\qquad\qquad\textcolor{vscodefuncation}{box\_convert}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{boxes},\textcolor{vscode3bracket}{'xywh'},\textcolor{vscode3bracket}{'xyxy'}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodeparameter}{ious}.\textcolor{vscodefuncation}{reshape}\textcolor{vscodebracket}{(}*\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}.\textcolor{vscodeparameter}{shape}\textcolor{vscodecomment}{[}:\textcolor{vscodecomment}{3]},\textcolor{vscodeparameter}{boxes}.\textcolor{vscodeparameter}{shape}\textcolor{vscodecomment}{[0]}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodeparameter}{ious}.\textcolor{vscodefuncation}{reshape}\textcolor{vscodebracket}{(}*\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors}.\textcolor{vscodeparameter}{shape}\textcolor{vscodecomment}{[}:\textcolor{vscodecomment}{3]},\textcolor{vscodeparameter}{boxes}.\textcolor{vscodeparameter}{shape}\textcolor{vscodecomment}{[0]}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{maxiou},\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{ious}.\textcolor{vscodefuncation}{max}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{maxiou},\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{ious}.\textcolor{vscodefuncation}{max}\textcolor{vscodebracket}{(}-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{currentgt}=\textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{[}\textcolor{vscodeparameter}{indexes}\textcolor{vscodebracket}{]}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{currentgt}=\textcolor{vscodeparameter}{boxes}\textcolor{vscodebracket}{[}\textcolor{vscodeparameter}{indexes}\textcolor{vscodebracket}{]}\\
 
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{maxiou}>\textcolor{vscodecomment}{0.7}\textcolor{vscode3bracket}{)}.\textcolor{vscodefuncation}{long}\textcolor{vscode3bracket}{()},\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{maxiou}<\textcolor{vscodecomment}{0.3}\textcolor{vscode3bracket}{)}.\textcolor{vscodefuncation}{long}\textcolor{vscode3bracket}{()}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)},\\
-    \qquad\qquad\qquad\textcolor{vscodefuncation}{calculatedxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{currentgt}\textcolor{vscodebracket}{)}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{maxiou}>\textcolor{vscodecomment}{0.7}\textcolor{vscode3bracket}{)}.\textcolor{vscodefuncation}{long}\textcolor{vscode3bracket}{()},\textcolor{vscode3bracket}{(}\textcolor{vscodeparameter}{maxiou}<\textcolor{vscodecomment}{0.3}\textcolor{vscode3bracket}{)}.\textcolor{vscodefuncation}{long}\textcolor{vscode3bracket}{()}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)},\\
+%     \qquad\qquad\qquad\textcolor{vscodefuncation}{calculatedxywh}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{anchors},\textcolor{vscodeparameter}{currentgt}\textcolor{vscodebracket}{)}
 
-\end{frame}
+% \end{frame}
 
-\begin{frame}
-    \qquad\textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{\_\_getitem\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\textcolor{vscodeparameter}{index}:\textcolor{vscodeclass}{int}\textcolor{vscodebracket}{)}:\\
+% \begin{frame}
+%     \qquad\textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{\_\_getitem\_\_}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{self},\textcolor{vscodeparameter}{index}:\textcolor{vscodeclass}{int}\textcolor{vscodebracket}{)}:\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{image},\textcolor{vscodeparameter}{target}=\textcolor{vscodeclass}{super}\textcolor{vscodebracket}{()}.\textcolor{vscodefuncation}{\_\_getitem\_\_}\textcolor{vscodebracket}{()}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{image},\textcolor{vscodeparameter}{target}=\textcolor{vscodeclass}{super}\textcolor{vscodebracket}{()}.\textcolor{vscodefuncation}{\_\_getitem\_\_}\textcolor{vscodebracket}{()}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeclass}{TF}.\textcolor{vscodefuncation}{to\_tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeclass}{TF}.\textcolor{vscodefuncation}{to\_tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{h},\textcolor{vscodeparameter}{w}=\textcolor{vscodeparameter}{image}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}-\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{h},\textcolor{vscodeparameter}{w}=\textcolor{vscodeparameter}{image}.\textcolor{vscodeparameter}{shape}\textcolor{vscodebracket}{[}-\textcolor{vscodecomment}{2}:\textcolor{vscodebracket}{]}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeclass}{TF}.\textcolor{vscodefuncation}{resize}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image},\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscode3bracket}{]},\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscode3bracket}{]}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeclass}{TF}.\textcolor{vscodefuncation}{resize}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image},\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{1}\textcolor{vscode3bracket}{]},\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize}\textcolor{vscode3bracket}{[}\textcolor{vscodecomment}{0}\textcolor{vscode3bracket}{]}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodereturn}{if} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagetransformers}:
+%     \qquad\qquad\textcolor{vscodereturn}{if} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagetransformers}:
 
-    \qquad\qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagetransformers}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\qquad\textcolor{vscodeparameter}{image}=\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagetransformers}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{image}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{bboxes}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{\_}\textcolor{vscode3bracket}{['bbox']} \textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{target}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{bboxes}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{\_}\textcolor{vscode3bracket}{['bbox']} \textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{target}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{bboxes}=\textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{w},\textcolor{vscodeparameter}{h}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize},\textcolor{vscodeparameter}{bboxes}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{bboxes}=\textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{w},\textcolor{vscodeparameter}{h}\textcolor{vscodecomment}{)},\textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{imagesize},\textcolor{vscodeparameter}{bboxes}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{category\_ids}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{\_}\textcolor{vscode3bracket}{['category\_id']} \textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{target}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{category\_ids}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{\_}\textcolor{vscode3bracket}{['category\_id']} \textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{target}\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodereturn}{if} \textcolor{vscode3bracket}{'positive\_negative'} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{outputItems}:\\
+%     \qquad\qquad\textcolor{vscodereturn}{if} \textcolor{vscode3bracket}{'positive\_negative'} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{outputItems}:\\
 
-    \qquad\qquad\qquad\textcolor{vscodeparameter}{positive\_negative},\textcolor{vscodeparameter}{regression}=\\
+%     \qquad\qquad\qquad\textcolor{vscodeparameter}{positive\_negative},\textcolor{vscodeparameter}{regression}=\\
 
-    \qquad\qquad\qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodefuncation}{getPositiveNegativeRegression}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{bboxes}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\qquad\qquad\textcolor{vscodeparameter}{self}.\textcolor{vscodefuncation}{getPositiveNegativeRegression}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{bboxes}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodeparameter}{result}=\textcolor{vscodebracket}{[]}\\
+%     \qquad\qquad\textcolor{vscodeparameter}{result}=\textcolor{vscodebracket}{[]}\\
 
-    \qquad\qquad\textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{outputItems}:\\
+%     \qquad\qquad\textcolor{vscodereturn}{for} \textcolor{vscodeparameter}{\_} \textcolor{vscodereturn}{in} \textcolor{vscodeparameter}{self}.\textcolor{vscodeparameter}{outputItems}:\\
 
-    \qquad\qquad\qquad\textcolor{vscodeparameter}{result}.\textcolor{vscodefuncation}{append}\textcolor{vscodebracket}{(}\textcolor{vscodefuncation}{eval}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{\_}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
+%     \qquad\qquad\qquad\textcolor{vscodeparameter}{result}.\textcolor{vscodefuncation}{append}\textcolor{vscodebracket}{(}\textcolor{vscodefuncation}{eval}\textcolor{vscodecomment}{(}\textcolor{vscodeparameter}{\_}\textcolor{vscodecomment}{)}\textcolor{vscodebracket}{)}\\
 
-    \qquad\qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{result}
-\end{frame}
+%     \qquad\qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{result}
+% \end{frame}

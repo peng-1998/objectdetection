@@ -53,29 +53,29 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}
-    \large
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}: \textcolor{vscodeclass}{Tensor}, \textcolor{vscodeparameter}{boxes2}: \textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodecomment}{\# boxes1:(N,4) boxes2:(M,4) use 'xyxy'}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{area1}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{2]}-\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{0]}\textcolor{vscodebracket}{)}*\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{3]}-\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{1]}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{area2}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{2]}-\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{0]}\textcolor{vscodebracket}{)}*\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{3]}-\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{1]}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{lt}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{max}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodedef}{None},:\textcolor{vscodecomment}{2]},\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,:\textcolor{vscodecomment}{2]}\textcolor{vscodebracket}{)}  \textcolor{vscodecomment}{\# [N,M,2]}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{rb}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{min}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodedef}{None},\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]},\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}  \textcolor{vscodecomment}{\# [N,M,2]}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{wh}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{rb}-\textcolor{vscodeparameter}{lt}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{clamp}
-    \textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{min}=\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{inter}=\textcolor{vscodeparameter}{wh}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}*\textcolor{vscodeparameter}{wh}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}  \textcolor{vscodecomment}{\# [N,M]}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{union}=\textcolor{vscodeparameter}{area1}\textcolor{vscodebracket}{[}:,\textcolor{vscodedef}{None}\textcolor{vscodebracket}{]}+\textcolor{vscodeparameter}{area2}-\textcolor{vscodeparameter}{inter}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{inter}/\textcolor{vscodeparameter}{union}
-\end{frame}
+% \begin{frame}
+%     \large
+%     \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}: \textcolor{vscodeclass}{Tensor}, \textcolor{vscodeparameter}{boxes2}: \textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodecomment}{\# boxes1:(N,4) boxes2:(M,4) use 'xyxy'}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{area1}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{2]}-\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{0]}\textcolor{vscodebracket}{)}*\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{3]}-\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{1]}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{area2}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{2]}-\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{0]}\textcolor{vscodebracket}{)}*\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{3]}-\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{1]}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{lt}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{max}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodedef}{None},:\textcolor{vscodecomment}{2]},\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,:\textcolor{vscodecomment}{2]}\textcolor{vscodebracket}{)}  \textcolor{vscodecomment}{\# [N,M,2]}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{rb}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{min}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes1}\textcolor{vscodecomment}{[}:,\textcolor{vscodedef}{None},\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]},\textcolor{vscodeparameter}{boxes2}\textcolor{vscodecomment}{[}:,\textcolor{vscodecomment}{2}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)}  \textcolor{vscodecomment}{\# [N,M,2]}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{wh}=\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{rb}-\textcolor{vscodeparameter}{lt}\textcolor{vscodebracket}{)}.\textcolor{vscodefuncation}{clamp}
+%     \textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{min}=\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{inter}=\textcolor{vscodeparameter}{wh}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}*\textcolor{vscodeparameter}{wh}\textcolor{vscodebracket}{[}...,\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{]}  \textcolor{vscodecomment}{\# [N,M]}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{union}=\textcolor{vscodeparameter}{area1}\textcolor{vscodebracket}{[}:,\textcolor{vscodedef}{None}\textcolor{vscodebracket}{]}+\textcolor{vscodeparameter}{area2}-\textcolor{vscodeparameter}{inter}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeparameter}{inter}/\textcolor{vscodeparameter}{union}
+% \end{frame}
 
 \begin{frame}
     \vspace{1em}
@@ -91,26 +91,26 @@
     $$x'=\frac{xw_t}{w_o},y'=\frac{yh_t}{h_o}$$
 \end{frame}
 
-\begin{frame}
-    \large
-    @\textcolor{vscodeclass}{no\_grad}\textcolor{vscodebracket}{()}\\
-    \vspace{0.2em}
-    \textcolor{vscodedef}{def} \textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{orgsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{tarsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{orgsize},\textcolor{vscodeparameter}{tarsize}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{orgsize}\textcolor{vscodebracket}{)},\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{tarsize}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{matrix}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{diag}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{tarsize}/\textcolor{vscodeparameter}{orgsize}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad \textcolor{vscodereturn}{return} \textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{cat}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{boxes}\textcolor{vscode3bracket}{[}:,:\textcolor{vscodecomment}{2}\textcolor{vscode3bracket}{]}@\textcolor{vscodeparameter}{matrix},\textcolor{vscodeparameter}{boxes}\textcolor{vscode3bracket}{[}:,:\textcolor{vscodecomment}{2}\textcolor{vscode3bracket}{]}@\textcolor{vscodeparameter}{matrix}\textcolor{vscodecomment}{]},-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}
-\end{frame}
+% \begin{frame}
+%     \large
+%     @\textcolor{vscodeclass}{no\_grad}\textcolor{vscodebracket}{()}\\
+%     \vspace{0.2em}
+%     \textcolor{vscodedef}{def} \textcolor{vscodefuncation}{resizeBox}\textcolor{vscodebracket}{(}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{orgsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{tarsize}:\textcolor{vscodeclass}{Tuple}\textcolor{vscodecomment}{[}\textcolor{vscodeclass}{int},\textcolor{vscodeclass}{int}\textcolor{vscodecomment}{]},\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{orgsize},\textcolor{vscodeparameter}{tarsize}=\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{orgsize}\textcolor{vscodebracket}{)},\textcolor{vscodeclass}{Tensor}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{tarsize}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{matrix}=\textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{diag}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{tarsize}/\textcolor{vscodeparameter}{orgsize}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad \textcolor{vscodereturn}{return} \textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{cat}\textcolor{vscodebracket}{(}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{boxes}\textcolor{vscode3bracket}{[}:,:\textcolor{vscodecomment}{2}\textcolor{vscode3bracket}{]}@\textcolor{vscodeparameter}{matrix},\textcolor{vscodeparameter}{boxes}\textcolor{vscode3bracket}{[}:,:\textcolor{vscodecomment}{2}\textcolor{vscode3bracket}{]}@\textcolor{vscodeparameter}{matrix}\textcolor{vscodecomment}{]},-\textcolor{vscodecomment}{1}\textcolor{vscodebracket}{)}
+% \end{frame}
 
 
 
@@ -134,27 +134,27 @@
 
 \end{frame}
 
-\begin{frame}
-    \large
-    @\textcolor{vscodeclass}{no\_grad}\textcolor{vscodebracket}{()}\\
-    \vspace{0.2em}
-    \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{nms}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{score}:\textcolor{vscodeclass}{Tensor}, \textcolor{vscodeparameter}{threshold}:\textcolor{vscodeclass}{float}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodecomment}{\# boxes:(N,4) score:(N)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{\_},\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{score}.\textcolor{vscodefuncation}{sort}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{descending}=\textcolor{vscodedef}{True}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodeparameter}{result}=\textcolor{vscodebracket}{[]}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodereturn}{while} \textcolor{vscodecomment}{0} \textcolor{vscodedef}{not in }\textcolor{vscodeparameter}{indexes}.\textcolor{vscodeparameter}{shape}:\\
-    \vspace{0.2em}
-    \qquad\qquad\textcolor{vscodeparameter}{result}.\textcolor{vscodefuncation}{append}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{indexes}\textcolor{vscodecomment}{[0]}\textcolor{vscodebracket}{)}\\
-    \vspace{0.2em}
-    \qquad\qquad\textcolor{vscodeparameter}{temp\_boxes}=\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{indexes}\textcolor{vscodecomment}{]}\\
-    \vspace{0.2em}
-    \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[}:\textcolor{vscodecomment}{1]},\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[1}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}\\
-    \vspace{0.2em}
-    \qquad\qquad\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{indexes}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}:\textcolor{vscodebracket}{][}\textcolor{vscodeparameter}{ious}<=\textcolor{vscodeparameter}{threshold}\textcolor{vscodebracket}{]}\\
-    \vspace{0.2em}
-    \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{result}\textcolor{vscodebracket}{)}
-\end{frame}
+% \begin{frame}
+%     \large
+%     @\textcolor{vscodeclass}{no\_grad}\textcolor{vscodebracket}{()}\\
+%     \vspace{0.2em}
+%     \textcolor{vscodedef}{def}  \textcolor{vscodefuncation}{nms}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{boxes}:\textcolor{vscodeclass}{Tensor},\textcolor{vscodeparameter}{score}:\textcolor{vscodeclass}{Tensor}, \textcolor{vscodeparameter}{threshold}:\textcolor{vscodeclass}{float}\textcolor{vscodebracket}{)}->\textcolor{vscodeclass}{Tensor}:\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodecomment}{\# boxes:(N,4) score:(N)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{\_},\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{score}.\textcolor{vscodefuncation}{sort}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{descending}=\textcolor{vscodedef}{True}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodeparameter}{result}=\textcolor{vscodebracket}{[]}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodereturn}{while} \textcolor{vscodecomment}{0} \textcolor{vscodedef}{not in }\textcolor{vscodeparameter}{indexes}.\textcolor{vscodeparameter}{shape}:\\
+%     \vspace{0.2em}
+%     \qquad\qquad\textcolor{vscodeparameter}{result}.\textcolor{vscodefuncation}{append}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{indexes}\textcolor{vscodecomment}{[0]}\textcolor{vscodebracket}{)}\\
+%     \vspace{0.2em}
+%     \qquad\qquad\textcolor{vscodeparameter}{temp\_boxes}=\textcolor{vscodeparameter}{boxes}\textcolor{vscodecomment}{[}\textcolor{vscodeparameter}{indexes}\textcolor{vscodecomment}{]}\\
+%     \vspace{0.2em}
+%     \qquad\qquad\textcolor{vscodeparameter}{ious}=\textcolor{vscodefuncation}{boxIou}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[}:\textcolor{vscodecomment}{1]},\textcolor{vscodeparameter}{temp\_boxes}\textcolor{vscodecomment}{[1}:\textcolor{vscodecomment}{]}\textcolor{vscodebracket}{)[}\textcolor{vscodecomment}{0}\textcolor{vscodebracket}{]}\\
+%     \vspace{0.2em}
+%     \qquad\qquad\textcolor{vscodeparameter}{indexes}=\textcolor{vscodeparameter}{indexes}\textcolor{vscodebracket}{[}\textcolor{vscodecomment}{1}:\textcolor{vscodebracket}{][}\textcolor{vscodeparameter}{ious}<=\textcolor{vscodeparameter}{threshold}\textcolor{vscodebracket}{]}\\
+%     \vspace{0.2em}
+%     \qquad\textcolor{vscodereturn}{return} \textcolor{vscodeclass}{torch}.\textcolor{vscodefuncation}{stack}\textcolor{vscodebracket}{(}\textcolor{vscodeparameter}{result}\textcolor{vscodebracket}{)}
+% \end{frame}
