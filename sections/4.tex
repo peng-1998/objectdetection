@@ -258,7 +258,7 @@
     Faster R-CNN的特征提取器使用预训练的卷积网络(resnet18、vgg16等)
     \begin{itemize}
         \item[1]固定特征提取器,训练RPN层
-        \item[2]固定特征提取器和RPN,训练分割部分
+        \item[2]固定特征提取器和RPN,训练分类部分
         \item[3]整体训练
     \end{itemize}
     在两个阶段的训练当中都有回归任务和分类任务,回归任务使用的是L1 Smooth Loss,分类使用CrossEntrpyLoss
